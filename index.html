@@ -248,12 +248,15 @@ borderLayer.eachLayer(l=>{
   const b = l.getBounds();
   J_BOUNDS[c] = J_BOUNDS[c] ? J_BOUNDS[c].extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
 });
-const HOME_VIEW = { center: DATA.center, zoom: 10 };
+// Frame the whole study area by its bounds (not a fixed zoom) so it fills
+// the viewport correctly at any window size.
+const HOME_BOUNDS = borderLayer.getBounds();
+map.fitBounds(HOME_BOUNDS, { padding:[20,20] });
 function zoomToJuris(){
   if(jFilter && J_BOUNDS[jFilter]){
     map.flyToBounds(J_BOUNDS[jFilter], {padding:[40,40], maxZoom:13.5, duration:.6});
   } else {
-    map.flyTo(HOME_VIEW.center, HOME_VIEW.zoom, {duration:.6});
+    map.flyToBounds(HOME_BOUNDS, {padding:[20,20], duration:.6});
   }
 }
 
@@ -401,11 +404,16 @@ document.getElementById('reset').onclick=()=>{
 buildChips(); buildLegend(); render();
 
 // Keep Leaflet sized to its container after layout settles, on window
-// resize, and on mobile orientation change (prevents mis-sized / over-
-// zoomed render when the container dimensions change after init).
-window.addEventListener('load', () => map.invalidateSize());
-window.addEventListener('resize', () => map.invalidateSize());
-window.addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(), 200));
+// resize, and on mobile orientation change. Re-fit to the study area so
+// framing stays correct at any window size (unless a jurisdiction is
+// filtered, in which case we leave the user's zoomed-in view alone).
+function refit(){
+  map.invalidateSize();
+  if(!jFilter) map.fitBounds(HOME_BOUNDS, { padding:[20,20] });
+}
+window.addEventListener('load', refit);
+window.addEventListener('resize', () => { clearTimeout(window.__rt); window.__rt = setTimeout(refit, 150); });
+window.addEventListener('orientationchange', () => setTimeout(refit, 250));
 </script>
 </body>
 </html>
