@@ -99,9 +99,11 @@ select,.selbox{width:100%;font-family:'Inter';font-size:12.5px;font-weight:500;c
 .pop-units{font-family:'Archivo';font-weight:800}
 
 @media(max-width:780px){
-  #app{flex-direction:column}
-  #rail{width:100%;min-width:0;height:auto;max-height:46vh}
-  #mapwrap{flex:1;min-height:54vh}
+  html,body{height:auto;overflow:auto}
+  #app{flex-direction:column;height:auto;width:100%}
+  #rail{width:100%;min-width:0;height:auto;max-height:none;overflow:visible}
+  .rail-scroll{overflow:visible;flex:none;padding:18px 22px 26px}
+  #mapwrap{flex:none;width:100%;height:70vh;min-height:430px}
 }
 
 /* jurisdiction borders */
@@ -397,6 +399,13 @@ document.getElementById('reset').onclick=()=>{
 };
 
 buildChips(); buildLegend(); render();
+
+// Keep Leaflet sized to its container after layout settles, on window
+// resize, and on mobile orientation change (prevents mis-sized / over-
+// zoomed render when the container dimensions change after init).
+window.addEventListener('load', () => map.invalidateSize());
+window.addEventListener('resize', () => map.invalidateSize());
+window.addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(), 200));
 </script>
 </body>
 </html>
