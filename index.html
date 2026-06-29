@@ -130,9 +130,45 @@ select,.selbox{width:100%;font-family:'Inter';font-size:12.5px;font-weight:500;c
 #bordertoggle .cc{color:var(--green);background:#E8F1EB}
 #masktoggle.off .cc{color:var(--slate);background:var(--bg)}
 #masktoggle .cc{color:var(--green);background:#E8F1EB}
+
+/* ── Intro gate ── */
+.intro-overlay{position:fixed;inset:0;z-index:2000;background:rgba(20,30,24,.55);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;
+  justify-content:center;padding:24px;opacity:1;transition:opacity .35s ease}
+.intro-overlay.hide{opacity:0;pointer-events:none}
+.intro-card{background:#fff;border-radius:16px;max-width:560px;width:100%;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.32);max-height:calc(100vh - 48px);display:flex;flex-direction:column}
+.intro-head{background:var(--green-dk);color:#fff;padding:28px 32px 24px;flex-shrink:0}
+.intro-head .eyebrow{font-family:'Archivo';font-weight:700;font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:10px;line-height:1.3}
+.intro-head h2{font-family:'Archivo';font-weight:800;font-size:25px;line-height:1.15;letter-spacing:-.01em}
+.intro-body{padding:24px 32px 28px;overflow-y:auto}
+.intro-body p{font-size:14px;line-height:1.7;color:var(--char)}
+.intro-prepared{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);
+  font-size:11.5px;line-height:1.55;color:var(--slate)}
+.intro-prepared b{color:var(--char)}
+.intro-btn{margin-top:22px;width:100%;background:var(--green);color:#fff;border:0;border-radius:10px;
+  padding:14px;font-family:'Archivo';font-weight:700;font-size:13.5px;letter-spacing:.02em;cursor:pointer;
+  transition:.15s;box-shadow:0 2px 10px rgba(0,71,42,.28)}
+.intro-btn:hover{background:var(--green)}
+.intro-btn:active{transform:translateY(1px)}
+@media(max-width:560px){.intro-head{padding:22px 22px 20px}.intro-head h2{font-size:21px}.intro-body{padding:20px 22px 24px}}
 </style>
 </head>
 <body>
+<div class="intro-overlay" id="intro">
+  <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <div class="intro-head">
+      <div class="eyebrow">Northern Virginia Affordable Housing Preservation Study</div>
+      <h2 id="intro-title">Before you explore the map</h2>
+    </div>
+    <div class="intro-body">
+      <p>This map shows subsidized affordable housing across nine Northern Virginia jurisdictions and flags which properties are most at risk of being lost to redevelopment or converted to market rate. The study's central argument is that who owns a property is the strongest predictor of whether it stays affordable, for-profit owners can sell or reposition, while mission-driven nonprofits, housing authorities, and public-private partnerships rarely do. Virginia's new Right of First Refusal law (HB&nbsp;4) and the LIHTC Year-15 exit window, is the backbone of how risk is assigned here. To explore it, color properties by ownership, risk, or ROFR status, filter by jurisdiction, and click any property for details, where each circle is a property and its size reflects unit count. Data was pulled from NHPD and HUD data.</p>
+      <div class="intro-prepared"><b>Prepared by:</b> David Huaman &middot; George Mason University Master of Real Estate Development, in partnership with NVAHA</div>
+      <button class="intro-btn" id="introBtn">Explore the map</button>
+    </div>
+  </div>
+</div>
 <div id="app">
   <aside id="rail">
     <div class="rail-head">
@@ -462,6 +498,16 @@ function refit(){
 window.addEventListener('load', refit);
 window.addEventListener('resize', () => { clearTimeout(window.__rt); window.__rt = setTimeout(refit, 150); });
 window.addEventListener('orientationchange', () => setTimeout(refit, 250));
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('introBtn'), ov=document.getElementById('intro');
+  if(btn&&ov){ btn.addEventListener('click',function(){
+    ov.classList.add('hide');
+    setTimeout(function(){ ov.style.display='none';
+      try{ if(window.map&&map.invalidateSize) map.invalidateSize(); }catch(e){} }, 360);
+  }); }
+})();
 </script>
 </body>
 </html>
